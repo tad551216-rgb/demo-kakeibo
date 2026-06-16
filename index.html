@@ -2381,9 +2381,11 @@ async function seedDemoIfNeeded(){
 }
 async function resetDemo(){
   await tclear("tx");await tclear("bal");await tclear("accounts");
-  await tdel("meta","demoSeeded");await tdel("meta","seededAcc");
+  await tclear("rules");
+  await tclear("meta");
   await seedIfNeeded();
   await seedDemoIfNeeded();
+  await loadRules();
   renderTab();
 }
 
