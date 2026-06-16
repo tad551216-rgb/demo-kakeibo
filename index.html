@@ -941,7 +941,7 @@ function medicalYTD(txs,year){
 // 区分の判定(薬局・ドラッグストアは医薬品購入、それ以外は診療・治療)
 function iryouhiKubun(name){
   const h=norm(name);
-  if(/薬局|ﾄﾞﾗｯｸ|ドラッグ|ファイン|ｺｺｶﾗ|ココカラ|ﾏﾂﾓﾄ|マツモト|ｳｴﾙｼｱ|ウエルシア|ｽｷﾞ薬|スギ薬|薬品|ﾔｯｷﾖｸ/.test(h)) return "医薬品購入";
+  if(/薬局|ﾄﾞﾗｯｸ|ドラッグ|薬品|ﾔｯｷﾖｸ/.test(h)) return "医薬品購入";
   if(/介護|ｶｲｺﾞ/.test(h)) return "介護保険サービス";
   return "診療・治療";
 }
@@ -1412,7 +1412,7 @@ function openManualAdd(){
   showModal(`
     <h3>手入力で追加</h3>
     <div class="frow"><label>話して入力(キーボードのマイク🎤で)</label>
-      <input type="text" id="aVoice" placeholder="例: 現金 昼食 2000円 プチグルマン" autocomplete="off"></div>
+      <input type="text" id="aVoice" placeholder="例: 現金 昼食 2000円 サンプル食堂" autocomplete="off"></div>
     <div class="note" id="aParsed" style="margin:-6px 2px 12px;min-height:1.2em"></div>
     <div class="frow"><label>日付</label><input type="date" id="aDate" value="${localToday()}"></div>
     <div class="frow"><label>金額(円)</label><input type="number" id="aAmt" inputmode="numeric" placeholder="例: 1500"></div>
