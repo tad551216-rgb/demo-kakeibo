@@ -290,98 +290,96 @@ async function getCatCustom(){
 
 /* ---------- 初期ルール(キーワード → カテゴリ) ---------- */
 const SEED_RULES = [
+  // ▼ デモ版の自動分類ルール:個人名・実在の固有名詞は含めず、一般名詞中心に整理しています
+  // 収入
   {kw:"給料",            cat:"給与収入"},
+  {kw:"給与",            cat:"給与収入"},
   {kw:"ネンキン",        cat:"年金収入"},
   {kw:"ｺｳｾｲﾈﾝｷﾝ",        cat:"年金収入"},
   {kw:"年金",            cat:"年金収入"},
-  {kw:"当選金",          cat:"その他収入"},
-  {kw:"PAYPAYｶ-ﾄﾞ",      cat:"振替(対象外)"},   // PayPay明細側で計上するため
-  {kw:"PayPayカード",    cat:"振替(対象外)"},
-  {kw:"ﾔﾏﾄ ﾀﾀﾞｼ",        cat:"振替(対象外)"},   // 本人間振込
-  {kw:"ｾｿﾞﾝ",            cat:"振替(対象外)"},   // セゾン明細側で計上するため
-  {kw:"セゾン",          cat:"振替(対象外)"},
-  {kw:"ﾐﾂｲｽﾐﾄﾓｶ-ﾄﾞ",     cat:"振替(対象外)"},   // Olive明細側で計上するため
-  {kw:"ｲｵﾝﾌｲﾅﾝｼﾔﾙ",      cat:"振替(対象外)"},   // イオンカード明細側で計上するため
-  {kw:"キャッシュバック",cat:"振替(対象外)"},   // ポイント交換・現金以外の動き
+  {kw:"利息",            cat:"その他収入"},
+  // 振替(カード引落・ポイント等は二重計上を防ぐため対象外)
+  {kw:"ｻﾝﾌﾟﾙｶ-ﾄﾞ",       cat:"振替(対象外)"},
+  {kw:"サンプルカード",  cat:"振替(対象外)"},
+  {kw:"カード引落",      cat:"振替(対象外)"},
+  {kw:"ｶｰﾄﾞﾋｷｵﾄｼ",       cat:"振替(対象外)"},
+  {kw:"キャッシュバック",cat:"振替(対象外)"},
   {kw:"ポイント交換",    cat:"振替(対象外)"},
   {kw:"ポイント利用",    cat:"振替(対象外)"},
   {kw:"ポイント充当",    cat:"振替(対象外)"},
-  {kw:"ポイントご利用",  cat:"振替(対象外)"},
   {kw:"ﾎﾟｲﾝﾄ利用",       cat:"振替(対象外)"},
-  {kw:"ﾎﾟｲﾝﾄ交換",       cat:"振替(対象外)"},
-  {kw:"イオンフィナンシャル",cat:"振替(対象外)"},
-  {kw:"ｶﾝｻｲﾃﾞﾝﾘﾖｸ",      cat:"水道光熱"},
+  {kw:"ﾌﾘｺﾐ",            cat:"振替(対象外)"},
+  // 水道光熱
   {kw:"電力",            cat:"水道光熱"},
-  {kw:"ｵｵｻｶｶﾞｽ",         cat:"水道光熱"},
-  {kw:"大阪ガス",        cat:"水道光熱"},
+  {kw:"ガス",            cat:"水道光熱"},
   {kw:"水道",            cat:"水道光熱"},
-  {kw:"ｷﾖｳｻｲ",           cat:"保険"},
+  // 保険
   {kw:"共済",            cat:"保険"},
   {kw:"保険",            cat:"保険"},
-  {kw:"ｶﾝﾘﾋ",            cat:"住居費"},
-  {kw:"管理費",          cat:"住居費"},
-  {kw:"薬局",            cat:"医療・薬"},
-  {kw:"ココカラ",        cat:"医療・薬"},
-  {kw:"ドラッグ",        cat:"医療・薬"},
-  {kw:"病院",            cat:"医療・薬"},
-  {kw:"クリニック",      cat:"医療・薬"},
-  {kw:"歯科",            cat:"医療・薬"},
-  {kw:"グルマン",        cat:"外食"},
-  {kw:"王将",            cat:"外食"},
-  {kw:"SOBA",            cat:"外食"},
-  {kw:"大元",            cat:"外食"},
-  {kw:"たつのや",        cat:"外食"},
-  {kw:"サンマルク",      cat:"外食"},
-  {kw:"マクドナルド",    cat:"外食"},
-  {kw:"珈琲",            cat:"外食"},
-  {kw:"カフェ",          cat:"外食"},
-  {kw:"Coke ON",         cat:"食費"},
-  {kw:"酒店",            cat:"食費"},
-  {kw:"スーパー",        cat:"食費"},
-  {kw:"イズミヤ",        cat:"食費"},
-  {kw:"ローソン",        cat:"食費"},
-  {kw:"セブン",          cat:"食費"},
-  {kw:"ファミリーマート",cat:"食費"},
-  {kw:"ユニクロ",        cat:"衣料"},
-  {kw:"ホテル",          cat:"旅行"},
-  {kw:"トヨタ",          cat:"車両費"},
-  {kw:"ガソリン",        cat:"車両費"},
-  {kw:"ENEOS",           cat:"車両費"},
-  {kw:"宝くじ",          cat:"娯楽"},
-  {kw:"Apple",           cat:"通信・サブスク"},
-  {kw:"ふるさと",        cat:"寄附・ふるさと納税"},
-  {kw:"さとふる",        cat:"寄附・ふるさと納税"},
-  {kw:"ダイソー",        cat:"日用品"},
-  {kw:"イトーヨーカドー",cat:"食費"},
-  {kw:"イオンリテール",  cat:"食費"},
-  {kw:"イオンモール",    cat:"食費"},
-  {kw:"イオン　",        cat:"食費"},
-  {kw:"おおとりウィングス",cat:"娯楽"},
-  {kw:"とんかつ",        cat:"外食"},
-  {kw:"ガスト",          cat:"外食"},
-  {kw:"びっくりドンキー",cat:"外食"},
-  {kw:"はしや",          cat:"外食"},
-  {kw:"さん天",          cat:"外食"},
-  {kw:"自販機",          cat:"食費"},
-  {kw:"トーヨーベンディング",cat:"食費"},
-  {kw:"道の駅",          cat:"旅行"},
-  {kw:"ﾌﾘｺﾐ",            cat:"振替(対象外)"},
   {kw:"国民健康保険",    cat:"保険"},
-  {kw:"ｺｸﾐﾝｹﾝｺｳﾎｹﾝ",     cat:"保険"},
   {kw:"国保",            cat:"保険"},
   {kw:"後期高齢",        cat:"保険"},
   {kw:"介護保険",        cat:"保険"},
-  {kw:"ｶｲｺﾞﾎｹﾝ",         cat:"保険"},
   {kw:"国民年金",        cat:"保険"},
-  {kw:"ｺｸﾐﾝﾈﾝｷﾝ",        cat:"保険"},
+  // 住居費
+  {kw:"管理費",          cat:"住居費"},
+  {kw:"家賃",            cat:"住居費"},
+  // 医療・薬(一般名詞)
+  {kw:"薬局",            cat:"医療・薬"},
+  {kw:"ドラッグ",        cat:"医療・薬"},
+  {kw:"病院",            cat:"医療・薬"},
+  {kw:"医院",            cat:"医療・薬"},
+  {kw:"クリニック",      cat:"医療・薬"},
+  {kw:"歯科",            cat:"医療・薬"},
+  // 外食(一般名詞)
+  {kw:"食堂",            cat:"外食"},
+  {kw:"レストラン",      cat:"外食"},
+  {kw:"珈琲",            cat:"外食"},
+  {kw:"カフェ",          cat:"外食"},
+  {kw:"とんかつ",        cat:"外食"},
+  {kw:"ラーメン",        cat:"外食"},
+  // 食費(一般名詞)
+  {kw:"スーパー",        cat:"食費"},
+  {kw:"酒店",            cat:"食費"},
+  {kw:"自販機",          cat:"食費"},
+  {kw:"コンビニ",        cat:"食費"},
+  {kw:"青果",            cat:"食費"},
+  {kw:"精肉",            cat:"食費"},
+  // 衣料
+  {kw:"衣料",            cat:"衣料"},
+  {kw:"洋品",            cat:"衣料"},
+  // 旅行
+  {kw:"ホテル",          cat:"旅行"},
+  {kw:"旅館",            cat:"旅行"},
+  {kw:"道の駅",          cat:"旅行"},
+  {kw:"フェリ",          cat:"旅行"},
+  {kw:"ﾌｴﾘ",             cat:"旅行"},
+  {kw:"鉄道",            cat:"旅行"},
+  // 車両費(一般名詞)
+  {kw:"ガソリン",        cat:"車両費"},
+  {kw:"ガスステーション",cat:"車両費"},
+  {kw:"スタンド",        cat:"車両費"},
+  {kw:"駐車",            cat:"車両費"},
+  // 娯楽
+  {kw:"宝くじ",          cat:"娯楽"},
+  // 通信・サブスク(一般名詞)
+  {kw:"通信",            cat:"通信・サブスク"},
+  {kw:"動画配信",        cat:"通信・サブスク"},
+  {kw:"サブスク",        cat:"通信・サブスク"},
+  // 寄附
+  {kw:"ふるさと",        cat:"寄附・ふるさと納税"},
+  {kw:"寄附",            cat:"寄附・ふるさと納税"},
+  {kw:"寄付",            cat:"寄附・ふるさと納税"},
+  // 日用品
+  {kw:"日用品",          cat:"日用品"},
+  {kw:"ホームセンター",  cat:"日用品"},
+  {kw:"家電",            cat:"日用品"},
+  // 税金・手数料(一般名詞)
   {kw:"固定資産税",      cat:"税金・手数料"},
-  {kw:"ｺﾃｲｼｻﾝｾﾞｲ",       cat:"税金・手数料"},
   {kw:"都市計画税",      cat:"税金・手数料"},
   {kw:"自動車税",        cat:"税金・手数料"},
-  {kw:"ｼﾞﾄﾞｳｼﾔｾﾞｲ",      cat:"税金・手数料"},
   {kw:"軽自動車税",      cat:"税金・手数料"},
   {kw:"住民税",          cat:"税金・手数料"},
-  {kw:"ｼﾞﾕｳﾐﾝｾﾞｲ",       cat:"税金・手数料"},
   {kw:"市民税",          cat:"税金・手数料"},
   {kw:"県民税",          cat:"税金・手数料"},
   {kw:"府民税",          cat:"税金・手数料"},
@@ -389,34 +387,12 @@ const SEED_RULES = [
   {kw:"消費税",          cat:"税金・手数料"},
   {kw:"予定納税",        cat:"税金・手数料"},
   {kw:"国税",            cat:"税金・手数料"},
-  {kw:"ｺｸｾﾞｲ",           cat:"税金・手数料"},
   {kw:"税務署",          cat:"税金・手数料"},
   {kw:"納税",            cat:"税金・手数料"},
-  {kw:"ﾉｳﾌ",             cat:"税金・手数料"},
-  {kw:"和泉市",          cat:"税金・手数料"},
-  {kw:"ｲｽﾞﾐｼ",           cat:"税金・手数料"},
   {kw:"印紙",            cat:"税金・手数料"},
   {kw:"ATM",             cat:"税金・手数料"},
   {kw:"手数料",          cat:"税金・手数料"},
-  {kw:"ﾃｽｳﾘﾖｳ",          cat:"税金・手数料"},
   {kw:"年会費",          cat:"税金・手数料"},
-  {kw:"ﾈﾝｶｲﾋ",           cat:"税金・手数料"},
-  {kw:"利息",            cat:"その他収入"},
-  {kw:"AMAZON",          cat:"その他支出"},
-  {kw:"ｱﾏｿﾞﾝ",           cat:"その他支出"},
-  {kw:"ユーネクスト",    cat:"通信・サブスク"},
-  {kw:"ﾕ-ﾈｸｽﾄ",          cat:"通信・サブスク"},
-  {kw:"U-NEXT",          cat:"通信・サブスク"},
-  {kw:"ガスステーション",cat:"車両費"},
-  {kw:"オプテージ",      cat:"通信・サブスク"},
-  {kw:"フェリ",          cat:"旅行"},
-  {kw:"ﾌｴﾘ",             cat:"旅行"},
-  {kw:"ビューティ",      cat:"その他支出"},
-  {kw:"ﾋﾞﾕｰﾃｲ",          cat:"その他支出"},
-  {kw:"ガソリン",        cat:"車両費"},
-  {kw:"ららぽ",          cat:"食費"},
-  {kw:"コストコ",        cat:"食費"},
-  {kw:"ｺｽﾄｺ",            cat:"食費"},
 ];
 
 /* ---------- IndexedDB ---------- */
@@ -485,153 +461,13 @@ async function seedIfNeeded(){
     await tput("meta",{k:"seededAcc",v:1});
   }
 }
-async function migrate(){
-  if(await tget("meta","mig2")) return;
-  // Olive明細の取込開始に伴う変更:
-  // 1) 銀行側の三井住友カード引落を「振替(対象外)」へ(カード明細側で計上するため)
-  const existingKw=new Set();
-  for(const r of await tall("rules")){
-    existingKw.add(r.kw);
-    if(r.kw==="ﾐﾂｲｽﾐﾄﾓｶ-ﾄﾞ" && r.cat!=="振替(対象外)"){
-      r.cat="振替(対象外)"; await tput("rules",r);
-    }
-    if(r.kw==="ガス"){ // 「ガスト」誤マッチ防止: 銀行摘要形式の半角カナへ
-      r.kw="ｶﾞｽ"; await tput("rules",r); existingKw.add("ｶﾞｽ");
-    }
-  }
-  // 2) Olive向け店舗ルールを追加(既存キーワードは重複追加しない)
-  for(const [kw,cat] of [["ダイソー","日用品"],["イトーヨーカドー","食費"],["イオンリテール","食費"],
-    ["イオンモール","食費"],["イオン　","食費"],["おおとりウィングス","娯楽"],["とんかつ","外食"],
-    ["ガスト","外食"],["びっくりドンキー","外食"],["はしや","外食"],["さん天","外食"],
-    ["自販機","食費"],["トーヨーベンディング","食費"],["道の駅","旅行"]]){
-    if(!existingKw.has(kw)) await tput("rules",{kw,cat});
-  }
-  await loadRules();
-  // 3) 手動確定していない明細にルールを再適用(過去のカード引落が振替に変わる)
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig2",v:1});
-  await migrate3();
-}
-async function migrate3(){
-  if(await tget("meta","mig3")) return;
-  // 全角半角の同一視(NFKC)導入に伴う調整:
-  // 「ｶﾞｽ」ルールが正規化で「ガスト」に誤マッチするため大阪ガス限定へ
-  for(const r of await tall("rules")){
-    if(r.kw==="ｶﾞｽ"||r.kw==="ガス"){ r.kw="ｵｵｻｶｶﾞｽ"; await tput("rules",r); }
-  }
-  await loadRules();
-  // 全角表記(イオン銀行等)が既存ルールに当たるようになるため再分類
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig3",v:1});
-  await migrate4();
-}
-async function migrate4(){
-  if(await tget("meta","mig4")) return;
-  const existingKw=new Set((await tall("rules")).map(r=>r.kw));
-  const add=[["固定資産税","税金・手数料"],["ｺﾃｲｼｻﾝｾﾞｲ","税金・手数料"],["都市計画税","税金・手数料"],
-    ["自動車税","税金・手数料"],["ｼﾞﾄﾞｳｼﾔｾﾞｲ","税金・手数料"],["軽自動車税","税金・手数料"],
-    ["住民税","税金・手数料"],["ｼﾞﾕｳﾐﾝｾﾞｲ","税金・手数料"],["市民税","税金・手数料"],
-    ["県民税","税金・手数料"],["府民税","税金・手数料"],["所得税","税金・手数料"],
-    ["消費税","税金・手数料"],["予定納税","税金・手数料"],["国税","税金・手数料"],
-    ["ｺｸｾﾞｲ","税金・手数料"],["税務署","税金・手数料"],["納税","税金・手数料"],
-    ["ﾉｳﾌ","税金・手数料"],["和泉市","税金・手数料"],["ｲｽﾞﾐｼ","税金・手数料"],
-    ["印紙","税金・手数料"],["ATM","税金・手数料"],["手数料","税金・手数料"],
-    ["ﾃｽｳﾘﾖｳ","税金・手数料"],["年会費","税金・手数料"],["ﾈﾝｶｲﾋ","税金・手数料"],["利息","その他収入"]];
-  for(const [kw,cat] of add) if(!existingKw.has(kw)) await tput("rules",{kw,cat});
-  await loadRules();
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig4",v:1});
-  await migrate5();
-}
-async function migrate5(){
-  if(await tget("meta","mig5")) return;
-  const existingKw=new Set((await tall("rules")).map(r=>r.kw));
-  const add=[["国民健康保険","保険"],["ｺｸﾐﾝｹﾝｺｳﾎｹﾝ","保険"],["国保","保険"],["後期高齢","保険"],
-    ["介護保険","保険"],["ｶｲｺﾞﾎｹﾝ","保険"],["国民年金","保険"],["ｺｸﾐﾝﾈﾝｷﾝ","保険"]];
-  for(const [kw,cat] of add) if(!existingKw.has(kw)) await tput("rules",{kw,cat});
-  await loadRules();
-  // 方向補正ロジック導入に伴う未確定明細の再分類
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig5",v:1});
-  await migrate6();
-}
-async function migrate6(){
-  if(await tget("meta","mig6")) return;
-  const existingKw=new Set();
-  for(const r of await tall("rules")){
-    existingKw.add(r.kw);
-    if(r.kw==="ｾｿﾞﾝ" && r.cat!=="振替(対象外)"){ r.cat="振替(対象外)"; await tput("rules",r); }
-  }
-  const add=[["セゾン","振替(対象外)"],["AMAZON","その他支出"],["ｱﾏｿﾞﾝ","その他支出"],
-    ["ユーネクスト","通信・サブスク"],["ﾕ-ﾈｸｽﾄ","通信・サブスク"],["U-NEXT","通信・サブスク"],
-    ["ガスステーション","車両費"],["ららぽ","食費"],["コストコ","食費"],["ｺｽﾄｺ","食費"]];
-  for(const [kw,cat] of add) if(!existingKw.has(kw)) await tput("rules",{kw,cat});
-  await loadRules();
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig6",v:1});
-  await migrate7();
-}
-async function migrate7(){
-  if(await tget("meta","mig7")) return;
-  const existingKw=new Set();
-  for(const r of await tall("rules")){
-    existingKw.add(r.kw);
-    if(r.kw==="ｲｵﾝﾌｲﾅﾝｼﾔﾙ" && r.cat!=="振替(対象外)"){ r.cat="振替(対象外)"; await tput("rules",r); }
-  }
-  const add=[["イオンフィナンシャル","振替(対象外)"],["オプテージ","通信・サブスク"],
-    ["フェリ","旅行"],["ﾌｴﾘ","旅行"],["ビューティ","その他支出"],["ﾋﾞﾕｰﾃｲ","その他支出"]];
-  for(const [kw,cat] of add) if(!existingKw.has(kw)) await tput("rules",{kw,cat});
-  await loadRules();
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig7",v:1});
-  await migrate8();
-}
-async function migrate8(){
-  if(await tget("meta","mig8")) return;
-  const existingKw=new Set((await tall("rules")).map(r=>r.kw));
-  const add=[["キャッシュバック","振替(対象外)"],["ポイント交換","振替(対象外)"],
-    ["ポイント利用","振替(対象外)"],["ポイント充当","振替(対象外)"],["ポイントご利用","振替(対象外)"],
-    ["ﾎﾟｲﾝﾄ利用","振替(対象外)"],["ﾎﾟｲﾝﾄ交換","振替(対象外)"]];
-  for(const [kw,cat] of add) if(!existingKw.has(kw)) await tput("rules",{kw,cat});
-  await loadRules();
-  for(const t of await tall("tx")){
-    if(t.locked) continue;
-    const before=t.category+"|"+t.type;
-    categorize(t);
-    if(t.category+"|"+t.type!==before) await tput("tx",t);
-  }
-  await tput("meta",{k:"mig8",v:1});
-}
+async function migrate(){ /* デモ版では本番データ向けマイグレーションを無効化 */ if(!await tget("meta","mig2")) await tput("meta",{k:"mig2",v:1}); }
+async function migrate3(){ if(!await tget("meta","mig3")) await tput("meta",{k:"mig3",v:1}); }
+async function migrate4(){ if(!await tget("meta","mig4")) await tput("meta",{k:"mig4",v:1}); }
+async function migrate5(){ if(!await tget("meta","mig5")) await tput("meta",{k:"mig5",v:1}); }
+async function migrate6(){ if(!await tget("meta","mig6")) await tput("meta",{k:"mig6",v:1}); }
+async function migrate7(){ if(!await tget("meta","mig7")) await tput("meta",{k:"mig7",v:1}); }
+async function migrate8(){ if(!await tget("meta","mig8")) await tput("meta",{k:"mig8",v:1}); }
 async function ensureAccount(name,kind){
   let a=(await tall("accounts")).find(x=>x.name===name);
   if(a) return a;
@@ -2559,13 +2395,11 @@ async function resetDemo(){
   await seedIfNeeded();
   await seedDemoIfNeeded();
   await loadRules();
-  await migrate();
-  await migrate3();
-  await migrate4();
-  await migrate5();
-  await migrate6();
-  await migrate7();
-  await migrate8();
+  // デモ版では各種マイグレーション(本番データ向けの固有名詞ルール追加)は実行しない。
+  // クリーンなSEED_RULESのみを使うため、フラグだけ立てて無効化する。
+  for(const m of ["mig2","mig3","mig4","mig5","mig6","mig7","mig8"]){
+    if(!await tget("meta",m)) await tput("meta",{k:m,v:1});
+  }
   renderTab();
   const drst=document.getElementById("demoReset");
   if(drst) drst.onclick=async()=>{
